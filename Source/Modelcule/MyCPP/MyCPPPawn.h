@@ -9,6 +9,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Math/Rotator.h"
+//#include "MyCppMoveComp.h"
 #include "MyCPPPawn.generated.h"
 
 
@@ -16,28 +17,32 @@ UCLASS()
 class MODELCULE_API AMyCPPPawn : public APawn
 {
 	GENERATED_BODY()
+
 public:
 	// Sets default values for this pawn's properties
 	AMyCPPPawn();
 
 	//Components
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	USceneComponent* MainSceneComponent;
 	
-	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* Camera;
+	//UPROPERTY(EditAnywhere)
+	//UCameraComponent* Camera;
 
-	UPROPERTY(VisibleAnywhere)
-	UArrowComponent* Arrow;
+	//UPROPERTY(EditAnywhere)
+	//UArrowComponent* Arrow;
 
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* Mesh;
+	UPROPERTY(EditAnywhere)
+	USceneComponent* Mesh;
 
-	UPROPERTY(VisibleAnywhere)
+	/*UPROPERTY(EditAnywhere)
 	UCapsuleComponent* Collision;
 
-	UPROPERTY(VisibleAnywhere)
-	USceneComponent* GrabLocation;
+	UPROPERTY(EditAnywhere)
+	USceneComponent* GrabLocation;*/
+
+	//UPROPERTY(VisibleAnywhere)
+	//UMyCppMoveComp* MoveComp;
 
 
 	//Variables
@@ -47,12 +52,17 @@ public:
 	UPROPERTY(Category=Default, BlueprintReadOnly)
 	bool IsOpenUI;
 
+	//Input Functions
+
+	//Input variables
+	FVector CurrentVelocity;
+
 	//Fuctions
 	UFUNCTION(BlueprintCallable)
 	void GrabObject();
 
-	UFUNCTION(BlueprintCallable)
-	AActor* FindRootObj(AActor* currObj);
+	//UFUNCTION(BlueprintCallable)
+	//AActor* FindRootObj(AActor* currObj);
 
 	UFUNCTION(BlueprintCallable)
 		void RotateGrabbedObj(FRotator rot);
@@ -69,5 +79,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+	void FBMove(float input);
 
 };

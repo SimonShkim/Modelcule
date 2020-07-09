@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Math/Vector.h"
+#include "Math/Rotator.h"
 #include "GameFramework/Actor.h"
 #include "MyCppMoveComp.generated.h"
 
@@ -20,10 +21,10 @@ public:
 
 	//Variables
 	UPROPERTY(VisibleAnywhere)
-	float MoveSpeed;
+	float MoveSpeed = 5.0;
 
 	UPROPERTY(VisibleAnywhere)
-	float TurnSpeed;
+	float TurnSpeed = 5.0;
 
 	//Functions
 	UFUNCTION(BlueprintCallable)
@@ -31,6 +32,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Turn(float UDInput, float LRInput);
+
+	/*UFUNCTION(BlueprintCallable)
+	void SetMoveSpeed(float ms);
+
+	UFUNCTION(BlueprintCallable)
+	void SetTurnSpeed(float ts);*/
 
 protected:
 	// Called when the game starts

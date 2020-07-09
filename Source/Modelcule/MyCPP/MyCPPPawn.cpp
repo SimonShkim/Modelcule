@@ -9,25 +9,30 @@ AMyCPPPawn::AMyCPPPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//allow response to player input
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
+
 	//Components
 	MainSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("MainSceneComponent"));
 	RootComponent = MainSceneComponent;
 
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera -> SetupAttachment(RootComponent);
 	
-	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
-	Arrow->SetupAttachment(Camera);
+	//Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
+	//Arrow->SetupAttachment(Camera);
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh -> SetupAttachment(RootComponent);
 	
-	Collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
+	/*Collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
 	Collision->SetupAttachment(Mesh);
 
 	GrabLocation = CreateDefaultSubobject<USceneComponent>(TEXT("GrabLocation"));
 	GrabLocation->SetupAttachment(MainSceneComponent);
-	
+	*/
+	//MoveComp = CreateDefaultSubobject<UMyCppMoveComp>(TEXT("MoveComp"));
+
 	//Variables
 	IsGrabbing = false;
 	IsOpenUI = false;
@@ -36,17 +41,20 @@ AMyCPPPawn::AMyCPPPawn()
 
 }
 
+//Input Functions
+
+
 //Functions
 void AMyCPPPawn::GrabObject() 
 {
 	
 }
 
-AActor* AMyCPPPawn::FindRootObj(AActor* currObj)
-{
-
-	return currObj;
-}
+//AActor* AMyCPPPawn::FindRootObj(AActor* currObj)
+//{
+//
+//	return currObj;
+//}
 
 void AMyCPPPawn::RotateGrabbedObj(FRotator rot)
 {
@@ -71,6 +79,11 @@ void AMyCPPPawn::Tick(float DeltaTime)
 void AMyCPPPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	SetupPlayerInputComponent(PlayerInputComponent);
-
+	InputComponent -> BindAxis("MoveForward", this, &AMyCPPPawn::FBMove);
 }
 
+
+void AMyCPPPawn::FBMove(float input)
+{
+	CurrentVelocity.X = FMath::Clamp(input, -1.0f, 1.0f) * 1000.0f;
+}
