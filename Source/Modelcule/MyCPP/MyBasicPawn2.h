@@ -11,6 +11,8 @@
 #include "Engine/EngineTypes.h"
 #include "Misc/CoreMiscDefines.h"
 #include "Components/PrimitiveComponent.h"
+#include "Components/ArrowComponent.h"
+#include "Components/SceneComponent.h"
 #include "CollisionQueryParams.h"
 #include "Math/Color.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -33,6 +35,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* GrabLoc;
 
+	UPROPERTY(EditAnywhere)
+	UCameraComponent* Camera;
+
+	UPROPERTY(EditAnywhere)
+	UArrowComponent* Arrow;
+
 	FVector CurrentVel;
 	FRotator CurrentRot;
 	//Functions
@@ -44,6 +52,7 @@ public:
 	void TurnUD(float input);
 
 	void LineTrace();
+	void GrabAttach(AActor* HitActor);
 
 protected:
 	// Called when the game starts or when spawned

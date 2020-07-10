@@ -14,12 +14,20 @@ AMyBasicPawn2::AMyBasicPawn2()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	
-	UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(RootComponent);
+
+	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
+	Arrow->SetupAttachment(Camera);
+	Arrow->SetRelativeLocation(FVector(20.f, 0.f, -30.f));
+	Arrow->SetVisibility(true);
 
 	MyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MyMesh"));
 	MyMesh->SetupAttachment(RootComponent);
 
+	GrabLoc = CreateDefaultSubobject<USceneComponent>(TEXT("GrabLoc"));
+	GrabLoc->SetupAttachment(RootComponent);
+	GrabLoc->SetRelativeLocation(FVector(500.f, 0.f, -20.f));
 
 
 }
@@ -149,7 +157,7 @@ void AMyBasicPawn2::LineTrace()
 	if (GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, TraceObjectTypes))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("hit"));
-		UPrimitiveComponent* HitActor = Hit.GetComponent();
+		AActor* HitActor = Hit.GetActor();
 		FString ActorName = HitActor->GetName();
 		if (ActorName.IsEmpty())
 		{
@@ -158,8 +166,14 @@ void AMyBasicPawn2::LineTrace()
 		else {
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *ActorName);
 		}
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), Hit.GetActor().GetName());
+		GrabAttach(HitActor);
 	}
+
+}
+
+void AMyBasicPawn2::GrabAttach(AActor* HitActor)
+{
+	HitActor->AttachToComponent(GrabLoc, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 	
