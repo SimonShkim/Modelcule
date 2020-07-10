@@ -9,39 +9,41 @@ AMyCppBond::AMyCppBond()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	Collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
-	Cylinder = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cylinder"));
-	
+	//Create
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-	Collision->SetupAttachment(RootComponent);
+	Cylinder = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cylinder"));
+
+	Collision1 = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision1"));
+	Collision2 = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision2"));
+	
+	End1 = CreateDefaultSubobject<USceneComponent>(TEXT("End1"));
+	End2 = CreateDefaultSubobject<USceneComponent>(TEXT("End2"));
+
+	//Set Parenting
 	Cylinder->SetupAttachment(RootComponent);
 
+	Collision1->SetupAttachment(Cylinder);
+	Collision2->SetupAttachment(Cylinder);
+	
+	End1->SetupAttachment(Collision1);
+	End2->SetupAttachment(Collision2);
+
+	//Set Static Mesh used by static mesh component
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>MeshAsset(TEXT("StaticMesh'/Game/MyModelculeStuff/MyStaticMeshes/MyCylinder_StaticMesh.MyCylinder_StaticMesh'"));
 	UStaticMesh* CylinderMesh = MeshAsset.Object;
 	Cylinder->SetStaticMesh(CylinderMesh);
-
+	
+	//Set material of static mesh component
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance>Material(TEXT("MaterialInstanceConstant'/Game/MyModelculeStuff/MyMaterials/Colors/MyBlackMat.MyBlackMat'"));
 	UMaterialInstance* BlackMat = Material.Object;
 	Cylinder->SetMaterial(0, BlackMat);
 
-	//SetMaterial();
-
-	
-	//UMaterial* BlackMat = CreateDefaultSubobject<UMaterial>(TEXT("MaterialInstanceConstant'/Game/MyModelculeStuff/MyMaterials/Colors/MyBlackMat.MyBlackMat'"));
-	
-	//Cylinder->SetMaterial(0, BlackMatDy);
-
-	//ConstructorHelpers::FObjectFinder<UMaterial>MeshAss(TEXT("MaterialInstanceConstant'/Game/MyModelculeStuff/MyMaterials/Colors/MyBlackMat.MyBlackMat'"));
-	//UMaterial* BlackMat = MeshAss.Object;
-	//Cylinder->SetMaterial(BlackMat);
+	//Set Scale
+	RootComponent->SetWorldScale3D(FVector(0.5f, 0.5f, 6.f));
 
 
 
-	//StaticMesh* MyCylinder = CreateDefaultSubobject<MyCylinder_StaticMesh> ;
-		
-		//StaticMesh'/Game/MyModelculeStuff/MyStaticMeshes/MySphere_StaticMesh.MySphere_StaticMesh'
-	//Cylinder->SetStaticMesh();
 
 }
 

@@ -9,6 +9,8 @@
 #include "Engine/World.h"
 //choose object type for line trace
 #include "Engine/EngineTypes.h"
+#include "Misc/CoreMiscDefines.h"
+#include "Components/PrimitiveComponent.h"
 #include "CollisionQueryParams.h"
 #include "Math/Color.h"
 #include "Kismet/KismetSystemLibrary.h"

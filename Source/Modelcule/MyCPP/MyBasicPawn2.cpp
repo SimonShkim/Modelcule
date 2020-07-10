@@ -129,10 +129,9 @@ void AMyBasicPawn2::TurnUD(float input)
 
 }
 
-
 void AMyBasicPawn2::LineTrace()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hi"));
+	UE_LOG(LogTemp, Warning, TEXT("Trace"));
 	FVector Start = GetActorLocation();
 	//determines grab distance
 	FVector End = GetActorForwardVector();
@@ -146,9 +145,20 @@ void AMyBasicPawn2::LineTrace()
 	FHitResult Hit;
 
 	TraceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
+
 	if (GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, TraceObjectTypes))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("hit"));
+		UPrimitiveComponent* HitActor = Hit.GetComponent();
+		FString ActorName = HitActor->GetName();
+		if (ActorName.IsEmpty())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Empty"));
+		}
+		else {
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *ActorName);
+		}
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), Hit.GetActor().GetName());
 	}
 }
 
