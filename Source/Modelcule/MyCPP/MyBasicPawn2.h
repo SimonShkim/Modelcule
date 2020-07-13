@@ -15,7 +15,9 @@
 #include "Components/SceneComponent.h"
 #include "CollisionQueryParams.h"
 #include "Math/Color.h"
+#include "Engine/Public/DrawDebugHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Math/Color.h"
 #include "MyBasicPawn2.generated.h"
 
 UCLASS()
@@ -41,8 +43,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	UArrowComponent* Arrow;
 
+	UPROPERTY(EditAnywhere)
+	AActor* OtherGuy;
+
 	FVector CurrentVel;
 	FRotator CurrentRot;
+
+	bool IsGrabbing = false;
+
 	//Functions
 	void MoveFB(float input);
 	void MoveLR(float input);
@@ -52,7 +60,6 @@ public:
 	void TurnUD(float input);
 
 	void LineTrace();
-	void GrabAttach(AActor* HitActor);
 
 protected:
 	// Called when the game starts or when spawned

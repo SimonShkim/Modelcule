@@ -27,7 +27,7 @@ AMyBasicPawn2::AMyBasicPawn2()
 
 	GrabLoc = CreateDefaultSubobject<USceneComponent>(TEXT("GrabLoc"));
 	GrabLoc->SetupAttachment(RootComponent);
-	GrabLoc->SetRelativeLocation(FVector(500.f, 0.f, -20.f));
+	GrabLoc->SetRelativeLocation(FVector(1500.f, 0.f, -30.f));
 
 
 }
@@ -79,8 +79,10 @@ void AMyBasicPawn2::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//Inputs for turning
 	InputComponent->BindAxis("Turn", this, &AMyBasicPawn2::TurnLR);
 	InputComponent->BindAxis("LookUp", this, &AMyBasicPawn2::TurnUD);
-
+	
+	//Inputs for grabbing
 	InputComponent->BindAction("Fire", IE_Pressed, this, & AMyBasicPawn2::LineTrace);
+
 
 }
 
@@ -112,6 +114,7 @@ void AMyBasicPawn2::MoveLR(float input)
 	SetActorLocation(NewLoc);
 
 }
+
 void AMyBasicPawn2::MoveUD(float input)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("ud"));
@@ -127,54 +130,79 @@ void AMyBasicPawn2::MoveUD(float input)
 void AMyBasicPawn2::TurnLR(float input)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("turn lr"));
-	CurrentRot.Yaw = FMath::Clamp(input, -1.0f, 1.0f) * 1000.0f;
+	CurrentRot.Yaw = FMath::Clamp(input, -1.0f, 1.0f) * 500.0f;
 
 }
 void AMyBasicPawn2::TurnUD(float input)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("turn ud"));
-	CurrentRot.Pitch = FMath::Clamp(input, -1.0f, 1.0f) * 1000.0f;
-
+	CurrentRot.Pitch = FMath::Clamp(input, -1.0f, 1.0f) * 500.0f;
+	//CurrentRot = new FRotator(0.f, input, 0.f).operator+=(CurrentRot);
 }
 
 void AMyBasicPawn2::LineTrace()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Trace"));
-	FVector Start = GetActorLocation();
-	//determines grab distance
-	FVector End = GetActorForwardVector();
-	End = End.operator*(1000.0f);
-	End.operator+=(Start);
 
-	//Object type
-	//FCollisionObjectQueryParams()
-	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes;
-
-	FHitResult Hit;
-
-	TraceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
-
-	if (GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, TraceObjectTypes))
+	if (!IsGrabbing) 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("hit"));
-		AActor* HitActor = Hit.GetActor();
-		FString ActorName = HitActor->GetName();
-		if (ActorName.IsEmpty())
+
+	
+		UE_LOG(LogTemp, Warning, TEXT("Trace"));
+		
+		FVector Start = GetActorLocation();
+		//determines grab distance
+		FVector End = GetActorForwardVector();
+		End = End.operator*(1000.0f);
+		End.operator+=(Start);
+
+		//Draw Debug Line
+		const FName TraceTag("MyTraceTag");
+		GetWorld()->DebugDrawTraceTag = TraceTag;
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.TraceTag = TraceTag;
+		
+
+		//Object type
+		//FCollisionObjectQueryParams()
+		TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes;
+
+		//Stores all information about a line trace hit
+		FHitResult Hit;
+
+		//Select object type line trace is looking for
+		TraceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
+
+		//if line trace gets a hit, get the hit actor
+		if (GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, TraceObjectTypes, TraceTag))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Empty"));
+			UE_LOG(LogTemp, Warning, TEXT("hit"));
+			OtherGuy = Hit.GetActor();
+
+			//log info
+			FString ActorName = OtherGuy->GetName();
+			if (ActorName.IsEmpty())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Empty"));
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *ActorName);
+			}
+			//attach the hit actor
+			OtherGuy->AttachToComponent(GrabLoc, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			IsGrabbing = true;
 		}
-		else {
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *ActorName);
-		}
-		GrabAttach(HitActor);
+
+	}
+	else
+	{
+		//detach the hit actor
+		OtherGuy->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		IsGrabbing = false;
+		OtherGuy = nullptr;
 	}
 
 }
 
-void AMyBasicPawn2::GrabAttach(AActor* HitActor)
-{
-	HitActor->AttachToComponent(GrabLoc, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-}
 
 	
 

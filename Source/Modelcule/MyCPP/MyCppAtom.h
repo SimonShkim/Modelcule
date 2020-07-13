@@ -4,6 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SceneComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Math/Vector.h"
+#include "Engine/StaticMesh.h"
 #include "MyCppAtom.generated.h"
 
 UCLASS()
@@ -14,6 +19,20 @@ class MODELCULE_API AMyCppAtom : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AMyCppAtom();
+
+	//Components
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* Sphere;
+
+	UPROPERTY(VisibleAnywhere)
+	UCapsuleComponent* Collision;
+	//Variables
+
+
+	//Functions
+	void SetColor();
+
+	void AttachToMe(AActor* OtherA);
 
 protected:
 	// Called when the game starts or when spawned

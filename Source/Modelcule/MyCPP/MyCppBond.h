@@ -6,10 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "Templates/Casts.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
 #include "Math/Vector.h"
+#include "Materials/MaterialInstance.h"
 #include "MyCppBond.generated.h"
 
 UCLASS()
@@ -21,6 +23,7 @@ public:
 	// Sets default values for this actor's properties
 	AMyCppBond();
 
+	//Components
 	//Visible Static Mesh
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Cylinder;
@@ -28,7 +31,7 @@ public:
 	//Components to detect overlap
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* Collision1;
-
+	
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* Collision2;
 
@@ -39,15 +42,34 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* End2;
 	
+	//Variables
 	UPROPERTY(VisibleAnywhere)
 	bool IsGrabbed = false;
 
+	//UPROPERTY(VisibleAnywhere)
+	//bool IsE1Attached;
+	//UPROPERTY(VisibleAnywhere)
+	//bool IsE2Attached;
 
+	//Attached Actors
+	UPROPERTY(VisibleAnywhere)
+	AActor* E1Actor;
+
+	UPROPERTY(VisibleAnywhere)
+	AActor* E2Actor;
+	
+	UPROPERTY(VisibleAnywhere)
+	AActor* ParentActor;
 	
 	//Functions
-	void AttachGrabbedObj(AActor* ParentActor, bool IsEnd1);
-
+	UFUNCTION()
+	void AttachEnd1(UPrimitiveComponent* OtherComp, AActor* ParentAct, UPrimitiveComponent* thing, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult);
+	void AttachEnd2(UPrimitiveComponent* OtherComp, AActor* ParentAct, UPrimitiveComponent* thing, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult);
+	
 	void DetachPawn();
+
+	void SetIsGrabbed(bool status);
+
 
 protected:
 	// Called when the game starts or when spawned
