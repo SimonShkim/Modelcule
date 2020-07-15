@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "Engine/EngineTypes.h"
 #include "Templates/Casts.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
@@ -25,25 +26,25 @@ public:
 
 	//Components
 	//Visible Static Mesh
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, Category="Component")
 	UStaticMeshComponent* Cylinder;
 
 	//Components to detect overlap
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Component")
 	UCapsuleComponent* Collision1;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Component")
 	UCapsuleComponent* Collision2;
 
 	//Attachment Locations
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Component")
 	USceneComponent* End1;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Component")
 	USceneComponent* End2;
 	
 	//Variables
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	bool IsGrabbed = false;
 
 	//UPROPERTY(VisibleAnywhere)
@@ -52,20 +53,26 @@ public:
 	//bool IsE2Attached;
 
 	//Attached Actors
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	AActor* E1Actor;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	AActor* E2Actor;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	AActor* ParentActor;
 	
 	//Functions
 	UFUNCTION()
-	void AttachEnd1(UPrimitiveComponent* OtherComp, AActor* ParentAct, UPrimitiveComponent* thing, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult);
-	void AttachEnd2(UPrimitiveComponent* OtherComp, AActor* ParentAct, UPrimitiveComponent* thing, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult);
+	void AttachLogic(UPrimitiveComponent* TouchedComp, AActor* ParentAct, UPrimitiveComponent* OtherComp, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult);
+
+	void AttachEnd1(UPrimitiveComponent* TouchedComp, AActor* ParentAct, UPrimitiveComponent* OtherComp, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult);
+	void AttachEnd2(UPrimitiveComponent* TouchedComp, AActor* ParentAct, UPrimitiveComponent* OtherComp, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult);
 	
+	UFUNCTION()
+	AActor*& GetEndAttActor(USceneComponent* End);
+	void	SetEndAttActor(USceneComponent* End);
+
 	void DetachPawn();
 
 	void SetIsGrabbed(bool status);

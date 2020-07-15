@@ -24,8 +24,8 @@ AMyCppBond::AMyCppBond()
 	//Set Parenting
 	Cylinder->SetupAttachment(RootComponent);
 
-	End1->SetupAttachment(RootComponent);
-	End2->SetupAttachment(RootComponent);
+	End1->SetupAttachment(Cylinder);
+	End2->SetupAttachment(Cylinder);
 
 	Collision1->SetupAttachment(End1);
 	Collision2->SetupAttachment(End2);
@@ -42,53 +42,134 @@ AMyCppBond::AMyCppBond()
 	Cylinder->SetMaterial(0, BlackMat);
 
 	//Set Scale
-	End1->SetRelativeLocation(FVector(0.f, 0.f, 300.0f));
+	End1->SetAbsolute(false, false, true);
+	End1->SetRelativeLocation(FVector(0.f, 0.f, 50.0f));
 	End1->SetRelativeScale3D(FVector(1.0f, 1.0f, 0.5f));
 
-	End2->SetRelativeLocation(FVector(0.f, 0.f, -300.0f));
+	End2->SetAbsolute(false, false, true);
+	End2->SetRelativeLocation(FVector(0.f, 0.f, -50.0f));
 	End2->SetRelativeScale3D(FVector(1.0f, 1.0f, 0.5f));
 
 	Cylinder->SetRelativeScale3D(FVector(0.5f, 0.5f, 6.f));
-
+	Cylinder->SetRelativeLocation(FVector(0.f, 0.f, 300.0f));
 	
 
 	//Overlap Events
 	Collision1->SetGenerateOverlapEvents(true);
 
-	Collision1->OnComponentBeginOverlap.AddDynamic(this, &AMyCppBond::AttachEnd1);
-	Collision2->OnComponentBeginOverlap.AddDynamic(this, &AMyCppBond::AttachEnd2);
+	Collision1->OnComponentBeginOverlap.AddDynamic(this, &AMyCppBond::AttachLogic);
+	Collision2->OnComponentBeginOverlap.AddDynamic(this, &AMyCppBond::AttachLogic);
 
 
 
 }
 
-
-void AMyCppBond::AttachEnd1(UPrimitiveComponent* OtherComp, AActor* ParentAct, UPrimitiveComponent* thing, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult)
+void AMyCppBond::AttachLogic(UPrimitiveComponent* TouchedComp, AActor* ParentAct, UPrimitiveComponent* OtherComp, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult)
 {
-	//if (!IsGrabbed)
-	//{
-		//ParentActor = Cast<MyCppBond>(ParentActor);
-	//}
-	//OtherActor is parent
-	DetachPawn();
-	this->AttachToComponent(thing, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	//TODO
+	//handle attachment
+	//set actor variable with attached actor
+	//only attach if end is empty
+	//change attachment rules
+	//change attach location when atom parent
+	//check other actor is atom
+	UE_LOG(LogTemp, Warning, TEXT("I'm In"));
+	USceneComponent* TheEnd = TouchedComp->GetAttachParent();
 
-	//Self is parent
-	//ParentAct->AttachToComponent(End1, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	
+	const FAttachmentTransformRules AttachRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, false);
+
+	//both ends empty
+	if (!(E1Actor->IsValidLowLevel() || E2Actor->IsValidLowLevel()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("1"));
+		//OtherActor is parent
+		//DetachPawn();
+		this->AttachToComponent(OtherComp, AttachRules);
+		ParentActor = ParentAct;
+		GetEndAttActor(TheEnd) = ParentAct;
+	}
+	//both ends occupied
+	else if(E1Actor->IsValidLowLevel() && E2Actor->IsValidLowLevel())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("2"));
+		return;
+	}
+
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("3"));
+		if (!GetEndAttActor(TheEnd)->IsValidLowLevel()) 
+		{
+			//Self is parent
+			ParentAct->AttachToComponent(TheEnd, AttachRules);
+			GetEndAttActor(TheEnd) = ParentAct;
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("4"));
+	//if (TheEnd == End1)
+	//{
+	//	E1Actor = ParentAct;
+	//}
+	//else if(TheEnd == End2)
+	//{
+	//	E2Actor = ParentAct;
+	//}
+	//(GetEndAttActor(TheEnd)) = ParentAct;
+
+	//SetEndAttActor(TheEnd);
+
+
+}
+
+void AMyCppBond::AttachEnd1(UPrimitiveComponent* TouchedComp, AActor* ParentAct, UPrimitiveComponent* OtherComp, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult)
+{
+	if (!(E1Actor->IsValidLowLevel() || E2Actor->IsValidLowLevel()))
+	{
+		//OtherActor is parent
+		DetachPawn();
+		this->AttachToComponent(OtherComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+	else 
+	{
+		//Self is parent
+		ParentAct->AttachToComponent(End1, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
 	E1Actor = ParentAct;
 }
 
-void AMyCppBond::AttachEnd2(UPrimitiveComponent* OtherComp, AActor* ParentAct, UPrimitiveComponent* thing, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult)
+void AMyCppBond::AttachEnd2(UPrimitiveComponent* TouchedComp, AActor* ParentAct, UPrimitiveComponent* OtherComp, int32 OtherIndex, bool FromSweep, const FHitResult& SweepResult)
 {
 	//Other Actor is parent
 	//this->AttachToComponent(OtherComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	
 	//Self is parent
 	ParentAct->AttachToComponent(End2, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	
 	E2Actor = ParentAct;
 }
+
+AActor*& AMyCppBond::GetEndAttActor(USceneComponent* End)
+{
+	UE_LOG(LogTemp, Warning, TEXT("5"));
+	if (End == End1) 
+	{ 
+		UE_LOG(LogTemp, Warning, TEXT("6")); 
+		return E1Actor; }
+	
+	else  { UE_LOG(LogTemp, Warning, TEXT("7")); 
+	return E2Actor; }
+	
+
+}
+
+void AMyCppBond::SetEndAttActor(USceneComponent* End)
+{
+	//if (End == End1) {  E1Actor = ; }
+
+	//else if (End == End2) { return E2Actor; }
+
+	//else { return nullptr; }
+}
+
 
 void AMyCppBond::DetachPawn()
 {

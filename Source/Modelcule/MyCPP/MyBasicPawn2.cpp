@@ -172,6 +172,10 @@ void AMyBasicPawn2::LineTrace()
 		//Select object type line trace is looking for
 		TraceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 
+
+		//Transform Rules
+		const FAttachmentTransformRules AttachRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, false);
+
 		//if line trace gets a hit, get the hit actor
 		if (GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, TraceObjectTypes, TraceTag))
 		{
@@ -188,7 +192,7 @@ void AMyBasicPawn2::LineTrace()
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *ActorName);
 			}
 			//attach the hit actor
-			OtherGuy->AttachToComponent(GrabLoc, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			OtherGuy->AttachToComponent(GrabLoc, AttachRules);
 			IsGrabbing = true;
 		}
 

@@ -21,10 +21,10 @@ public:
 	AMyCppAtom();
 
 	//Components
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Component")
 	UStaticMeshComponent* Sphere;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Component")
 	UCapsuleComponent* Collision;
 	//Variables
 

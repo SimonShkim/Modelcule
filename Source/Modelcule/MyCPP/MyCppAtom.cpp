@@ -28,11 +28,15 @@ AMyCppAtom::AMyCppAtom()
 
 	//Overlap settings
 	Collision->SetGenerateOverlapEvents(true);
+
+	SetColor();
 }
 
 void AMyCppAtom::SetColor()
 {
-
+	static ConstructorHelpers::FObjectFinder<UMaterialInstance>Material(TEXT("MaterialInstanceConstant'/Game/MyModelculeStuff/MyMaterials/Colors/MyBlackMat.MyBlackMat'"));
+	UMaterialInstance* BlackMat = Material.Object;
+	Sphere->SetMaterial(0, BlackMat);
 }
 
 void AMyCppAtom::AttachToMe(AActor* OtherA)

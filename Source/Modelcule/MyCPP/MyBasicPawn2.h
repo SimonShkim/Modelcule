@@ -31,19 +31,19 @@ public:
 
 
 	//Variables
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Component")
 	USceneComponent* MyMesh;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Component")
 	USceneComponent* GrabLoc;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Component")
 	UCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Component")
 	UArrowComponent* Arrow;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "OtherStuff")
 	AActor* OtherGuy;
 
 	FVector CurrentVel;
