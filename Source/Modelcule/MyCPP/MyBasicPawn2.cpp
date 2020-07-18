@@ -1,7 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MyBasicPawn2.h"
+#include "MyCppAtom.h"
+#include "MyCppBond.h"
+#include "MyCppUserWidget.h"
+
 
 // Sets default values
 AMyBasicPawn2::AMyBasicPawn2()
@@ -13,7 +16,7 @@ AMyBasicPawn2::AMyBasicPawn2()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	
+
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(RootComponent);
 
@@ -29,7 +32,39 @@ AMyBasicPawn2::AMyBasicPawn2()
 	GrabLoc->SetupAttachment(RootComponent);
 	GrabLoc->SetRelativeLocation(FVector(1500.f, 0.f, -30.f));
 
+	//NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
 
+	MyUI = CreateDefaultSubobject<UMyCppUserWidget>(TEXT("UI"));
+
+	static ConstructorHelpers::FClassFinder<UMyCppUserWidget> BPUserWidget(TEXT("WidgetBlueprint'/Game/MyModelculeStuff/MyWidgetStuff/MyWidgetBlueprint2'"));
+	if (BPUserWidget.Succeeded())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("find success"));
+		TheBPUI = BPUserWidget.Class;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("find fail"));
+	}
+
+	ConstructorHelpers::FObjectFinder<UUserWidget> BPThing(TEXT("WidgetBlueprint'/Game/MyModelculeStuff/MyWidgetStuff/MyWidgetBlueprint2.MyWidgetBlueprint2'"));
+	if (BPUserWidget.Succeeded())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("find success2"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("find fail2"));
+	}
+	//if (BPUserWidget.Succeeded())
+	//{
+	//	TheBPUI = BPUserWidget.Class;
+	//}
+
+	//TheBPUI = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
+	//TheBPUI = BPUserWidget.Class->GetDefaultObject();
+	//MyUI = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
+	//UMyCppUserWidget* TheUI = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
 }
 
 // Called when the game starts or when spawned
@@ -83,6 +118,29 @@ void AMyBasicPawn2::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//Inputs for grabbing
 	InputComponent->BindAction("Fire", IE_Pressed, this, & AMyBasicPawn2::LineTrace);
 
+	//Inputs for rotating object
+	InputComponent->BindAxis("TurnRate", this, &AMyBasicPawn2::RotateLR);
+	InputComponent->BindAxis("LookUpRate", this, &AMyBasicPawn2::RotateUD);
+
+	InputComponent->BindAction("OpenUI", IE_Pressed, this, &AMyBasicPawn2::OpenUI);
+}
+
+void AMyBasicPawn2::RotateUD(float input)
+{
+	RotateHeldObj(FRotator(0.f, 0.f, input));
+}
+void AMyBasicPawn2::RotateLR(float input)
+{
+	RotateHeldObj(FRotator(0.f, input, 0.f));
+}
+void AMyBasicPawn2::RotateHeldObj(FRotator InRot)
+{
+
+	if (IsGrabbing)
+	{
+		FRotator NewRot = OtherGuy->GetActorRotation();
+		OtherGuy->SetActorRotation(UKismetMathLibrary::ComposeRotators(NewRot, InRot));
+	}
 
 }
 
@@ -142,7 +200,6 @@ void AMyBasicPawn2::TurnUD(float input)
 
 void AMyBasicPawn2::LineTrace()
 {
-
 	if (!IsGrabbing) 
 	{
 
@@ -180,7 +237,7 @@ void AMyBasicPawn2::LineTrace()
 		if (GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, TraceObjectTypes, TraceTag))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("hit"));
-			OtherGuy = Hit.GetActor();
+			OtherGuy = GetRoot(Hit.GetActor());
 
 			//log info
 			FString ActorName = OtherGuy->GetName();
@@ -192,7 +249,7 @@ void AMyBasicPawn2::LineTrace()
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *ActorName);
 			}
 			//attach the hit actor
-			OtherGuy->AttachToComponent(GrabLoc, AttachRules);
+			OtherGuy->AActor::AttachToComponent(GrabLoc, AttachRules);
 			IsGrabbing = true;
 		}
 
@@ -207,7 +264,49 @@ void AMyBasicPawn2::LineTrace()
 
 }
 
+AActor* AMyBasicPawn2::GetRoot(AActor* HitActor)
+{
+	if (Cast<AMyCppBond>(HitActor) != nullptr)
+	{
+		return Cast<AMyCppBond>(HitActor)->FindRoot();
+	}
+	else
+	{
+		return Cast<AMyCppAtom>(HitActor)->FindRoot();
+	}
+	//if (Cast<AMyCppAtom>(HitActor) != nullptr)
+}
 
+void AMyBasicPawn2::OpenUI()
+{
+	//if (*MyWidgetBlueprint2)
+	//{
+	//	//UMyCppUserWidget* TheUI = MyWidgetBlueprint2->CreateDefaultSubobject(TEXT("UI"));
+	//	//UMyCppUserWidget* TheUI = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
+	//	//UMyCppUserWidget* TheUI = MyWidgetBlueprint2->GetDefaultObject();
+	//	//MyUI = CreateDefaultSubobject<UMyCppUserWidget>(TEXT("UI"));
+	//	//MyWidgetBlueprint2 = CreateWidget<UMyWidgetBlueprint2>(this, TSubclassOf<UMyCppUserWidget>UMyWidgetBlueprint2, Test);
+	//	//MyWidgetBlueprint2 = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
+	//	MyUI->AddToViewport(100);
+	//	UE_LOG(LogTemp, Warning, TEXT("UI"));
+	//}
+	UE_LOG(LogTemp, Warning, TEXT("OpenUI Called"));
+	//MyUI->AddToViewport(0);
+	//MyUI->AddToScreen(nullptr, 10);
+	//UEditableText*& UITextBox = MyUI->GetTextInputWidget();
+	
+	
+
+	//FInputModeGameAndUI Mode;
+	//Mode.SetLockMouseToViewport(true);
+	//Mode.SetHideCursorDuringCapture(false);
+	//SetInputMode(Mode);
+
+
+
+
+	
+}
 	
 
 

@@ -9,7 +9,13 @@
 #include "Components/CapsuleComponent.h"
 #include "Math/Vector.h"
 #include "Engine/StaticMesh.h"
+#include "MyCppBond.h"
 #include "MyCppAtom.generated.h"
+
+class AMyBasicPawn2;
+class AMyCppBond;
+class UMyCppUserWidget;
+
 
 UCLASS()
 class MODELCULE_API AMyCppAtom : public AActor
@@ -26,13 +32,23 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UCapsuleComponent* Collision;
-	//Variables
 
+	UPROPERTY(EditAnywhere, Category = "Component")
+	USceneComponent* AttachLoc;
+	//Variables
+	UPROPERTY(EditAnywhere, Category = "Variables")
+	AActor* ParentActor;
 
 	//Functions
+	UFUNCTION()
+	void SetParentActor(AActor* parent);
+
 	void SetColor();
 
 	void AttachToMe(AActor* OtherA);
+
+	UFUNCTION()
+	AActor* FindRoot();
 
 protected:
 	// Called when the game starts or when spawned

@@ -1,7 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+//My Classes
 #include "MyCppAtom.h"
+#include "MyBasicPawn2.h"
+#include "MyCppBond.h"
+#include "MyCppUserWidget.h"
+
 
 // Sets default values
 AMyCppAtom::AMyCppAtom()
@@ -13,23 +17,36 @@ AMyCppAtom::AMyCppAtom()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 	Sphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere"));
 	Collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
+	AttachLoc = CreateDefaultSubobject<USceneComponent>(TEXT("Attach Location"));
 	
 	//Set parenting
 	Sphere->SetupAttachment(RootComponent); 
 	Collision->SetupAttachment(Sphere);
+	AttachLoc->SetupAttachment(RootComponent);
 
+	//choose collision preset
+	Sphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	//Set material
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>MeshAsset(TEXT("StaticMesh'/Game/MyModelculeStuff/MyStaticMeshes/MySphere_StaticMesh.MySphere_StaticMesh'"));
 	UStaticMesh* SphereMesh = MeshAsset.Object;
 	Sphere->SetStaticMesh(SphereMesh);
 
 	//Set Scale
-	Collision->SetRelativeScale3D(FVector(1.0f, 1.0f, 0.5f));
+	Collision->SetRelativeScale3D(FVector(2.5f, 2.5f, 1.25f));
 
 	//Overlap settings
 	Collision->SetGenerateOverlapEvents(true);
 
 	SetColor();
+	Collision->SetActive(true);
+	AttachLoc->SetActive(true);
+
+
+}
+
+void AMyCppAtom::SetParentActor(AActor* parent)
+{
+	ParentActor = parent;
 }
 
 void AMyCppAtom::SetColor()
@@ -42,6 +59,18 @@ void AMyCppAtom::SetColor()
 void AMyCppAtom::AttachToMe(AActor* OtherA)
 {
 	
+}
+
+AActor* AMyCppAtom::FindRoot()
+{
+	if (ParentActor == nullptr)
+	{
+		return this;
+	}
+	else
+	{
+		return Cast<AMyCppBond>(ParentActor)->FindRoot();
+	}
 }
 
 // Called when the game starts or when spawned

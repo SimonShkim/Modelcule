@@ -1,6 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+//My Classes
 #include "MyCppBond.h"
+#include "MyBasicPawn2.h"
+#include "MyCppAtom.h"
+#include "MyCppUserWidget.h"
+
 
 // Sets default values
 AMyCppBond::AMyCppBond()
@@ -40,6 +45,9 @@ AMyCppBond::AMyCppBond()
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance>Material(TEXT("MaterialInstanceConstant'/Game/MyModelculeStuff/MyMaterials/Colors/MyBlackMat.MyBlackMat'"));
 	UMaterialInstance* BlackMat = Material.Object;
 	Cylinder->SetMaterial(0, BlackMat);
+	//Choose collision preset
+	Cylinder->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	//Cylinder->SetCollisionResponseToChannel
 
 	//Set Scale
 	End1->SetAbsolute(false, false, true);
@@ -56,11 +64,15 @@ AMyCppBond::AMyCppBond()
 
 	//Overlap Events
 	Collision1->SetGenerateOverlapEvents(true);
+	Collision2->SetGenerateOverlapEvents(true);
 
 	Collision1->OnComponentBeginOverlap.AddDynamic(this, &AMyCppBond::AttachLogic);
 	Collision2->OnComponentBeginOverlap.AddDynamic(this, &AMyCppBond::AttachLogic);
 
-
+	End1->SetActive(true);
+	End2->SetActive(true);
+	Collision1->SetActive(true);
+	Collision2->SetActive(true);
 
 }
 
@@ -77,39 +89,43 @@ void AMyCppBond::AttachLogic(UPrimitiveComponent* TouchedComp, AActor* ParentAct
 	USceneComponent* TheEnd = TouchedComp->GetAttachParent();
 
 	const FAttachmentTransformRules AttachRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, false);
-
-	//both ends empty
-	if (!(E1Actor->IsValidLowLevel() || E2Actor->IsValidLowLevel()))
+	if (ParentAct->GetClass() != GetClass())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("1"));
-		//OtherActor is parent
-		//DetachPawn();
-		this->AttachToComponent(OtherComp, AttachRules);
-		ParentActor = ParentAct;
-		GetEndAttActor(TheEnd) = ParentAct;
-	}
-	//both ends occupied
-	else if(E1Actor->IsValidLowLevel() && E2Actor->IsValidLowLevel())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("2"));
-		return;
-	}
-
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("3"));
-		if (!GetEndAttActor(TheEnd)->IsValidLowLevel()) 
+		//both ends empty
+		if (!(E1Actor->IsValidLowLevel() || E2Actor->IsValidLowLevel()))
 		{
-			//Self is parent
-			ParentAct->AttachToComponent(TheEnd, AttachRules);
+			UE_LOG(LogTemp, Warning, TEXT("1"));
+			//OtherActor is parent
+			DetachPawn();
+			this->AttachToComponent(Cast<AMyCppAtom>(ParentAct)->AttachLoc, AttachRules);
+			ParentActor = ParentAct;
 			GetEndAttActor(TheEnd) = ParentAct;
+		}
+		//both ends occupied
+		else if (E1Actor->IsValidLowLevel() && E2Actor->IsValidLowLevel())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("2"));
+			return;
+		}
+
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("3"));
+			if (!GetEndAttActor(TheEnd)->IsValidLowLevel())
+			{
+				//Self is parent
+				ParentAct->AttachToComponent(TheEnd, AttachRules);
+				GetEndAttActor(TheEnd) = ParentAct;
+
+				Cast<AMyCppAtom>(ParentAct)->SetParentActor(this);
+			}
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("4"));
 	//if (TheEnd == End1)
 	//{
 	//	E1Actor = ParentAct;
-	//}
+	//}w
 	//else if(TheEnd == End2)
 	//{
 	//	E2Actor = ParentAct;
@@ -173,13 +189,41 @@ void AMyCppBond::SetEndAttActor(USceneComponent* End)
 
 void AMyCppBond::DetachPawn()
 {
-	AActor::DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	//AActor::DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	//AActor::DetachRootComponentFromParent(true);
 
+	//Cast<AMyBasicPawn2>(GetAttachParentActor())->AMyBasicPawn2::LineTrace();
+
+
+}
+
+void AMyCppBond::DetachEnd1Obj()
+{
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	SetIsGrabbed(false);
+}
+
+void AMyCppBond::DetachEnd2Obj()
+{
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	SetIsGrabbed(false);
 }
 
 void AMyCppBond::SetIsGrabbed(bool status)
 {
 	IsGrabbed = status;
+}
+
+AActor* AMyCppBond::FindRoot()
+{
+	if (ParentActor == nullptr)
+	{
+		return this;
+	}
+	else
+	{
+		return Cast<AMyCppAtom>(ParentActor)->FindRoot();
+	}
 }
 
 // Called when the game starts or when spawned

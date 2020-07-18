@@ -4,16 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+//Actor Components
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
+
 #include "Engine/EngineTypes.h"
 #include "Templates/Casts.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
 #include "Math/Vector.h"
 #include "Materials/MaterialInstance.h"
+//#include "MyBasicPawn2.h"
+//#include "MyCppAtom.h"
 #include "MyCppBond.generated.h"
+
+//fixing circular dependency
+class AMyBasicPawn2;
+class AMyCppAtom;
+class UMyCppUserWidget;
 
 UCLASS()
 class MODELCULE_API AMyCppBond : public AActor
@@ -74,8 +83,12 @@ public:
 	void	SetEndAttActor(USceneComponent* End);
 
 	void DetachPawn();
+	void DetachEnd1Obj();
+	void DetachEnd2Obj();
 
 	void SetIsGrabbed(bool status);
+
+	AActor* FindRoot();
 
 
 protected:
