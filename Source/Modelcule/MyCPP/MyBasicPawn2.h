@@ -42,6 +42,7 @@
 #include "UObject/UObjectGlobals.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/Class.h"
+#include "Engine/LocalPlayer.h"
 //#include "Blueprint/UserWidget.h"
 
 #include "MyBasicPawn2.generated.h"
@@ -78,14 +79,13 @@ public:
 	AActor* OtherGuy;
 
 	//UI Things
+	//class
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UMyCppUserWidget> TheBPUI;
+	//instance
 	UPROPERTY(EditAnywhere, Category = "UI")
 	UMyCppUserWidget* MyUI;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UMyCppUserWidget> TheBPUI;
-
-	
-	
 
 	FVector CurrentVel;
 	FRotator CurrentRot;

@@ -34,44 +34,35 @@ AMyBasicPawn2::AMyBasicPawn2()
 
 	//NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
 
-	MyUI = CreateDefaultSubobject<UMyCppUserWidget>(TEXT("UI"));
+	//MyUI = CreateDefaultSubobject<UMyCppUserWidget>(TEXT("UI"));
 
 	static ConstructorHelpers::FClassFinder<UMyCppUserWidget> BPUserWidget(TEXT("WidgetBlueprint'/Game/MyModelculeStuff/MyWidgetStuff/MyWidgetBlueprint2'"));
 	if (BPUserWidget.Succeeded())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("find success"));
 		TheBPUI = BPUserWidget.Class;
+
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("find fail"));
 	}
 
-	ConstructorHelpers::FObjectFinder<UUserWidget> BPThing(TEXT("WidgetBlueprint'/Game/MyModelculeStuff/MyWidgetStuff/MyWidgetBlueprint2.MyWidgetBlueprint2'"));
-	if (BPUserWidget.Succeeded())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("find success2"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("find fail2"));
-	}
-	//if (BPUserWidget.Succeeded())
-	//{
-	//	TheBPUI = BPUserWidget.Class;
-	//}
-
-	//TheBPUI = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
-	//TheBPUI = BPUserWidget.Class->GetDefaultObject();
-	//MyUI = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
-	//UMyCppUserWidget* TheUI = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
 }
 
 // Called when the game starts or when spawned
 void AMyBasicPawn2::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (*TheBPUI)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI"));
+		MyUI = CreateWidget<UMyCppUserWidget>(GetWorld()->GetFirstPlayerController(), TheBPUI);
+
+		MyUI->AddToViewport(100);
+
+
+	}
 }
 
 // Called every frame
@@ -279,21 +270,18 @@ AActor* AMyBasicPawn2::GetRoot(AActor* HitActor)
 
 void AMyBasicPawn2::OpenUI()
 {
-	//if (*MyWidgetBlueprint2)
+	//if (*TheBPUI)
 	//{
-	//	//UMyCppUserWidget* TheUI = MyWidgetBlueprint2->CreateDefaultSubobject(TEXT("UI"));
-	//	//UMyCppUserWidget* TheUI = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
-	//	//UMyCppUserWidget* TheUI = MyWidgetBlueprint2->GetDefaultObject();
-	//	//MyUI = CreateDefaultSubobject<UMyCppUserWidget>(TEXT("UI"));
-	//	//MyWidgetBlueprint2 = CreateWidget<UMyWidgetBlueprint2>(this, TSubclassOf<UMyCppUserWidget>UMyWidgetBlueprint2, Test);
-	//	//MyWidgetBlueprint2 = NewObject<UMyCppUserWidget>(MyWidgetBlueprint2);
-	//	MyUI->AddToViewport(100);
 	//	UE_LOG(LogTemp, Warning, TEXT("UI"));
+	//	MyUI = CreateWidget<UMyCppUserWidget>(GetWorld()->GetFirstPlayerController(), TheBPUI);
+	//
+	//	MyUI->AddToViewport(100);
+
+	//	
 	//}
 	UE_LOG(LogTemp, Warning, TEXT("OpenUI Called"));
-	//MyUI->AddToViewport(0);
-	//MyUI->AddToScreen(nullptr, 10);
-	//UEditableText*& UITextBox = MyUI->GetTextInputWidget();
+	MyUI->TextInput->SetKeyboardFocus();
+	//MyUI->TextInput->OnTextChanged(GetText());
 	
 	
 
